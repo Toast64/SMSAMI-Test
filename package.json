@@ -13,7 +13,8 @@
     "mysql": "^2.18.1",
     "passport-http": "*",
     "passport-local": "*",
-    "pug": "^2.0.0-rc.2"
+    "pug": "^2.0.0-rc.2",
+    "nodemon": "^2.0.19",
   },
   "scripts": {
     "start": "nodemon dist/index.js",
