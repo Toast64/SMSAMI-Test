@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Posts Test</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <div class="container mt-4 mb-4 d-flex justify-content-between">
+        <button id="showposts" class="btn btn-primary">Show Posts List</button>
+        <button id="createPost" class=" btn btn-warning">Create Post</button>
+        <button class=" btn btn-danger">Delete Post</button>
+        <button class=" btn btn-secondary">Update Post</button>
+    </div>
+
+    <div class="container d-flex">
+        <h5 class="mr-4">Description</h5>
+        <textarea id="textareaD" style="height: 150px; width: 300px;"></textarea>
+    </div>
+    <div class=" container">
+        <button id="createBtn" class="btn btn-info">Post</button>
+    </div>
+    
+
+    <script>
+        document.getElementById('showposts').onclick = function () {
+            location.href = 'http://localhost:4411/showposts';
+        }
+
+        document.getElementById('createPost').onclick = function () {
+            location.href = 'http://localhost:4411/createpost';
+        }
+
+        document.getElementById("createBtn").onclick = function () {
+            let textareaData = document.getElementById("textareaD").value;
+            try {
+                let result = fetch('http://localhost:4411/createPost', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ description: textareaData })
+                });
+                result.then((success) => { console.log("success") });
+            } catch (error) {
+                console.log(error);
+            }
+            location.href = 'http://localhost:4411/showposts';
+        }
+    </script>
+</body>
+
+</html>

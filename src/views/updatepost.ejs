@@ -1,0 +1,218 @@
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Posts Test</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script>
+        const result = fetch('http://localhost:4411/showall')
+            .then(response => response.json())
+            .then(data => {
+                let tempdata = data;
+                let allposts = document.getElementById('allposts');
+                tempdata.map((item, index) => {
+                    let tr = document.createElement('tr');
+                    let td1 = document.createElement('td');
+                    let td2 = document.createElement('td');
+                    let td3 = document.createElement('td');
+                    let td4 = document.createElement('td');
+                    let tdb3 = document.createElement('button');
+                    let tdb4 = document.createElement('button');
+
+
+
+                    tr.setAttribute('class', 'bg-light w-100');
+                    tdb3.setAttribute('id', item.id + "upvote")
+                    tdb4.setAttribute('id', item.id + "downvote")
+
+
+                    let chkbx = document.createElement('input');
+                    chkbx.setAttribute('type', 'checkbox');
+                    chkbx.setAttribute('id', item.id + "chkbx");
+                    td1.append(chkbx);
+
+                    td2.innerHTML = item.description;
+                    tdb3.innerHTML = item.upvotes;
+                    tdb4.innerHTML = item.downvotes;
+
+                    td3.append(tdb3)
+                    td4.append(tdb4)
+
+                    tr.appendChild(td1);
+                    tr.appendChild(td2);
+                    tr.appendChild(td3);
+                    tr.appendChild(td4);
+                    allposts.appendChild(tr);
+                });
+            })
+            .catch(error => console.log("error", error));
+
+    </script>
+
+
+</head>
+
+
+<body>
+
+    <div class="container mt-4 mb-4 d-flex justify-content-between">
+        <button id="showposts" class="btn btn-primary">Show Posts List</button>
+        <button id="createPost" class=" btn btn-warning">Create Post</button>
+        <button id="deletePost" class=" btn btn-danger">Delete Post</button>
+        <button id="updatePost" class=" btn btn-secondary">Update Post</button>
+</body>
+</div>
+<div class="container">
+    <table class="w-100">
+        <thead>
+            <tr class="bg-secondary">
+                <th>#</th>
+                <th>Description</th>
+                <th>Upvotes</th>
+                <th>Downvotes</th>
+            </tr>
+        </thead>
+        <tbody id="allposts" class="w-100">
+        </tbody>
+    </table>
+    <div class="mt-5">
+        <h6>Check a box of post that you want to edit:</h6>
+        <h6>Write the updated description in the text area below and click on the update button:</h6>
+        <div class="container d-flex">
+            <p class="mr-4">Description</p>
+            <textarea id="textareaD" style="height: 150px; width: 300px;"></textarea>
+        </div>
+        <div class=" container">
+            <button id="updateBtn" class="btn btn-info">Update</button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    setTimeout(() => {
+        let btns = document.getElementsByTagName("button")
+        for (let i = 0; i < btns.length; i++) {
+            btns[i].addEventListener("click", function () {
+                let id = this.id;
+                let upvote = id.split("upvote")[0];
+                let downvote = id.split("downvote")[0];
+                let upvotebtn = document.getElementById(id);
+                let downvotebtn = document.getElementById(id);
+                let upvotecount = upvotebtn.innerHTML;
+                let downvotecount = downvotebtn.innerHTML;
+                if (id.includes("upvote")) {
+                    upvotecount++;
+                    upvotebtn.innerHTML = upvotecount;
+                    try {
+                        let result = fetch('http://localhost:4411/updateVotes', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({ id: upvote, upvotes: upvotecount })
+                        });
+
+                        result.then((success) => { console.log("success") });
+                    } catch (error) {
+                        console.log(error);
+                    }
+                }
+                else {
+                    downvotecount++;
+                    downvotebtn.innerHTML = downvotecount;
+                    try {
+                        let result = fetch('http://localhost:4411/downVotes', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({ id: downvote, downvotes: downvotecount })
+                        });
+
+                        result.then((success) => { console.log("success") });
+                    } catch (error) {
+                        console.log(error);
+                    }
+                }
+            })
+        }
+    }, 1000);
+
+    document.getElementById('showposts').onclick = function () {
+        location.href = 'http://localhost:4411/showposts';
+    }
+
+    document.getElementById('createPost').onclick = function () {
+        location.href = 'http://localhost:4411/createpost';
+    }
+
+    document.getElementById('deletePost').onclick = function () {
+        let chkbxs = document.getElementsByTagName("input")
+        for (let i = 0; i < chkbxs.length; i++) {
+            if (chkbxs[i].checked) {
+                let id = chkbxs[i].id.split("chkbx")[0];
+                try {
+                    let result = fetch('http://localhost:4411/deletePost', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ id: id })
+                    });
+
+                    result.then((success) => { console.log("success") });
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+        }
+        location.href = 'http://localhost:4411/showposts';
+    }
+
+    document.getElementById("updateBtn").onclick = function () {
+
+        let chkbx = document.getElementsByTagName("input");
+        let checked = 0
+        for (let i = 0; i < chkbx.length; i++) {
+            if (chkbx[i].checked) {
+                checked = chkbx[i].id.split("chkbx")[0]
+            }
+        }
+        if (checked !== 0) {
+            let textareaData = document.getElementById("textareaD").value;
+            try {
+                let result = fetch('http://localhost:4411/updatePost', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ id: checked, description: textareaData })
+                });
+                result.then((success) => { console.log("success") });
+            } catch (error) {
+                console.log(error);
+            }
+            location.href = 'http://localhost:4411/showposts';
+        } else{
+            alert("Please select a post to update")
+            location.href = 'http://localhost:4411/updatepost';
+        }
+    }
+
+
+    document.getElementById('updatePost').onclick = function () {
+        location.href = 'http://localhost:4411/updatepost';
+    }
+</script>
+
+</body>
+
+</html>
